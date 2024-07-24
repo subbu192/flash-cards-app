@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 
 import { connectDb } from "./libs/db";
 import authRouter from './routes/authRoutes';
+import categoryRouter from './routes/categoryRoutes';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ const app: Application = express();
 app.use(express.json());
 
 app.use('/auth', authRouter);
+app.use('/category', categoryRouter);
 
 app.get('/', (req: Request, res: Response) => {
     res.send("Server is running...");

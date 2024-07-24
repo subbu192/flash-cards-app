@@ -8,8 +8,8 @@ router.get('/:category_id', getFCsFromCategory);
 
 router.post('/', createCategory);
 
-router.put('/', editCategory);
+router.put('/:category_id', editCategory);
 
-router.delete('/', deleteCategory);
+router.delete('/:category_id', deleteCategory);
 
 export default router;

@@ -2,32 +2,15 @@ import { Request, Response } from 'express';
 import Category from '../models/categoryModel';
 import FlashCard from '../models/flashcardModel';
 
-interface CreateCategoryReqBody {
+interface CreateOrEditCategoryReqBody {
     name: string,
-    user: {
-        name: string,
-        email: string,
-        id: string
-    }
-}
-
-interface EditCategoryReqBody {
-    name: string,
-    user: {
-        name: string,
-        email: string,
-        id: string
-    },
-    new_name: string
+    user: string,
 }
 
 export const createCategory = async (req: Request, res: Response) => {
-    const { name, user }: CreateCategoryReqBody = req.body;
+    const category: CreateOrEditCategoryReqBody = req.body;
 
-    const newCategory = new Category({
-        name: name,
-        user: user.id,
-    })
+    const newCategory = new Category(category);
 
     newCategory.save()
         .then(() => {
@@ -39,25 +22,25 @@ export const createCategory = async (req: Request, res: Response) => {
 }
 
 export const editCategory = async (req: Request, res: Response) => {
-    const { name, user, new_name }: EditCategoryReqBody = req.body;
+    const { category_id } = req.params;
+    const updated_category: CreateOrEditCategoryReqBody = req.body;
 
-    Category.findOneAndUpdate({ name: name, user: user.id }, { name: new_name })
+    Category.findOneAndUpdate({ _id: category_id }, updated_category)
         .then(() => {
-            res.json({ status: 200, message: 'Category Name Changed.' });
+            res.json({ status: 200, message: 'Category Edited.' });
         })
         .catch((err) => {
-            res.json({ status: 404, message: 'Failed to change category name.' });
+            res.json({ status: 404, message: 'Failed to edit category.' });
         });
 }
 
 export const deleteCategory = async (req: Request, res: Response) => {
-    const { name, user }: CreateCategoryReqBody = req.body;
-
-    const category = await Category.findOne({ name: name, user: user.id });
+    const { category_id } = req.params;
+    const { user } = req.body;
     
-    FlashCard.deleteMany({ category: category?._id, user: user.id })
+    FlashCard.deleteMany({ category: category_id, user: user })
         .then(() => {
-            Category.findOneAndDelete({ name: name, user: user.id })
+            Category.findOneAndDelete({ _id: category_id, user: user })
                 .then(() => {
                     res.json({ status: 200, message: 'Category deleted.' });
                 })

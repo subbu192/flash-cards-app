@@ -22,7 +22,7 @@ export const loginUser = async (req: Request, res: Response) => {
         .then(async (user) => {
             const verified: boolean = await bcrypt.compare(password, user?.password!);
             if (verified) {
-                const userDetails = { name: user?.name, email: user?.email };
+                const userDetails = { name: user?.name, email: user?.email, id: user?._id };
                 const jwtToken: string = jwt.sign(userDetails, String(process.env.JWT_SECRET), { expiresIn: 60 * 10 });
                 
                 res.json({ status: 200, user: userDetails, jwt: jwtToken, message: 'Login Successfull.' });
